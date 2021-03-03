@@ -9,17 +9,14 @@ const FileUpload = () => {
   const [uploadedFile, setUploadedFile] = useState({});
   const [message, setMessage] = useState('');
   const [uploadPercentage, setUploadPercentage] = useState(0);
-
   const onChange = e => {
     setFile(e.target.files[0]);
     setFilename(e.target.files[0].name);
   };
-
   const onSubmit = async e => {
     e.preventDefault();
     const formData = new FormData();
     formData.append('file', file);
-
     try {
       const res = await axios.post('/upload', formData, {
         headers: {
@@ -36,11 +33,8 @@ const FileUpload = () => {
           setTimeout(() => setUploadPercentage(0), 10000);
         }
       });
-
-      const { fileName, filePath } = res.data;
-
-      setUploadedFile({ fileName, filePath });
-
+      const { fileName, filePath,preview,thumbnail,original } = res.data;
+      setUploadedFile({ fileName, filePath,original,preview,thumbnail });
       setMessage('File Uploaded');
     } catch (err) {
       if (err.response.status === 500) {
@@ -50,7 +44,6 @@ const FileUpload = () => {
       }
     }
   };
-
   return (
     <Fragment>
       {message ? <Message msg={message} /> : null}
@@ -66,9 +59,7 @@ const FileUpload = () => {
             {filename}
           </label>
         </div>
-
         <Progress percentage={uploadPercentage} />
-
         <input
           type='submit'
           value='Upload'
@@ -76,12 +67,28 @@ const FileUpload = () => {
         />
       </form>
       {uploadedFile ? (
-        <div className='row mt-5'>
-          <div className='col-md-6 m-auto'>
-            <h3 className='text-center'>{uploadedFile.fileName}</h3>
-            <img style={{ width: '100%' }} src={uploadedFile.filePath} alt='' />
-          </div>
-        </div>
+        // <div className='row mt-5'>
+        //   <div className='col-md-6 m-auto'>
+        //     <h3 className='text-center'>{uploadedFile.fileName}</h3>
+        //     <img style={{ width: '100%' }} src={uploadedFile.filePath} alt='' />
+        //     <img style={{ width: '100%' }} src={uploadedFile.preview} alt='' />
+        //     <img style={{ width: '100%' }} src={uploadedFile.thumbnail} alt='' />
+        //   </div>
+        // </div>
+        <div class="container">
+  <div class="row">
+  <h3 className='text-center'>{uploadedFile.fileName}</h3>
+    <div class="col-sm">
+    <img style={{ width: '100%' }} src={uploadedFile.filePath} alt='' />
+    </div>
+    <div class="col-sm">
+    <img style={{ width: '100%' }} src={uploadedFile.preview} alt='' />
+    </div>
+    <div class="col-sm">
+    <img style={{ width: '100%' }} src={uploadedFile.thumbnail} alt='' />
+    </div>
+  </div>
+</div>
       ) : null}
     </Fragment>
   );

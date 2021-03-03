@@ -6,6 +6,7 @@ var multer  = require('multer');
 var cors = require('cors');
 const sharp = require('sharp');
 const fs = require("fs");
+const mv = require('mv');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
@@ -14,48 +15,41 @@ var storage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, 'uploads/');
      },
-    filename: function (req, file, cb) {
-        cb(null , file.originalname);
+    // filename: function (req, file, cb) {
+    //     cb(null , file.originalname);
         
-    }
-    // filename: function(req, file, cb) {
-    //     cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
     // }
+    filename: function(req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+    }
 });
 var upload = multer({ storage: storage });
 app.post('/upload', upload.single('file'), function (req, res, next) {
+    
     const host = req.hostname;
     // return res.json(req.file);
-const filePath = req.protocol + "://" + host + ':8000/uploads/' + req.file.filename;
-sharp(__dirname + '/uploads/health.jpg').resize(200,200) 
+const filePathOriginal = req.protocol + "://" + host + ':8000/uploads/' + req.file.filename;
+const filePathThumbnail = req.protocol + "://" + host + ':8000/uploads/thumbnail/' + req.file.filename;
+const filePathPreview = req.protocol + "://" + host + ':8000/uploads/preview/' + req.file.filename;
+
+sharp(__dirname + '/uploads/'+req.file.filename).resize(200,200) // TODO: use req.file.filename
 .jpeg({quality : 50}).toFile(__dirname  
-    + '/uploads/health_thumb.jpg'); 
-sharp(__dirname + '/uploads/health.jpg').resize(640,480) 
+    + '/uploads/thumbnail/'+req.file.filename); // TODO use thumb folder and set name to req.file.filename
+sharp(__dirname + '/uploads/'+req.file.filename).resize(640,480) 
 .jpeg({quality : 80}).toFile(__dirname  
-    + '/uploads/health_preview.jpg'); 
-    sharp(__dirname + '/uploads/image.png').resize(200,200) 
-.jpeg({quality : 50}).toFile(__dirname  
-    + '/uploads/image_thumb.jpg'); 
-sharp(__dirname + '/uploads/image.png').resize(640,480) 
-.jpeg({quality : 80}).toFile(__dirname  
-    + '/uploads/image_preview.jpg'); 
-    sharp(__dirname + '/uploads/butterfly.jpg').resize(200,200) 
-.jpeg({quality : 50}).toFile(__dirname  
-    + '/uploads/butterfly_thumb.jpg'); 
-sharp(__dirname + '/uploads/butterfly.jpg').resize(640,480) 
-.jpeg({quality : 80}).toFile(__dirname  
-    + '/uploads/butterfly_preview.jpg'); 
-  // req.file is the `avatar` file
-return res.json({
-    path: filePath
+    + '/uploads/preview/'+req.file.filename);  // TODO use preview folder and set name to req.file.filename
+    //const file = req.files.file;
+return res.json({ // TODO: returm imgee thath with preview and thumbnail
+    origianl: filePathOriginal,
+    preview:filePathPreview,
+    thumbnail:filePathThumbnail,
+    filePath: `uploads/${req.file.filename}`
+    
 });
-
 })
-//image compression with tiny API
-// Make a new image
-
 
 app.listen(8000, function(){
   console.log("server is listening on port: 8000");
 });
 module.exports = app;
+

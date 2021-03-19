@@ -8,6 +8,6 @@ Testing
 To run tests: npm run test
 
 API Routes
-HTTP VERB	ENDPOINT	FUNCTIONALITY
+HTTP ENDPOINT	FUNCTIONALITY
 POST	[ upload] /api/upload	Upload a single file
 POST	[ multiple] /api/multiple	Upload multiple files

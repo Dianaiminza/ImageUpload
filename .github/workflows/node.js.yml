@@ -26,12 +26,16 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
-    - name: Clean install dependencies and build
+    
+
+    - name: Install Dependencies 
   run: |
     npm i mocha
     npm i supertest
     npm i chai
-    npm run build
+    
+    - name: Build
+      run: npm build
 
+    - name: Test
+      run: npm test
